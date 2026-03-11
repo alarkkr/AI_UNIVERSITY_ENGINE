@@ -2,7 +2,9 @@ from agents.planner_agent import PlannerAgent
 from agents.retriever_agent import RetrieverAgent
 from agents.reasoner_agent import ReasonerAgent
 from agents.verifier_agent import VerifierAgent
+
 from memory.vector_memory import VectorMemory
+from memory.knowledge_graph import KnowledgeGraph
 
 
 class Orchestrator:
@@ -15,15 +17,17 @@ class Orchestrator:
         self.verifier = VerifierAgent()
 
         self.memory = VectorMemory()
+        self.graph = KnowledgeGraph()
 
     def process(self, question):
 
-        # check memory first
+        # check vector memory first
         stored = self.memory.search(question)
 
         if stored:
             return stored
 
+        # agent pipeline
         plan = self.planner.plan(question)
 
         knowledge = self.retriever.retrieve(plan["query"])
@@ -32,7 +36,17 @@ class Orchestrator:
 
         final = self.verifier.verify(reasoning)
 
-        # store answer
+        # store answer in vector memory
         self.memory.add(question, final)
+
+        # extract relations for knowledge graph
+        words = final.split()
+
+        for w in words:
+
+            w = w.strip(",.()[]{}")
+
+            if len(w) > 5:
+                self.graph.add_relation(question, w)
 
         return final
