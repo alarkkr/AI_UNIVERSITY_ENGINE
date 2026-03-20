@@ -5,6 +5,7 @@ from agents.verifier_agent import VerifierAgent
 
 from memory.vector_memory import VectorMemory
 from memory.knowledge_graph import KnowledgeGraph
+from engine.dataset_generator import DatasetGenerator
 
 
 class Orchestrator:
@@ -18,35 +19,32 @@ class Orchestrator:
 
         self.memory = VectorMemory()
         self.graph = KnowledgeGraph()
+        self.dataset = DatasetGenerator()
 
     def process(self, question):
 
-        # check vector memory first
+        # Check vector memory cache
         stored = self.memory.search(question)
 
         if stored:
             return stored
 
-        # agent pipeline
+        # Planning stage
         plan = self.planner.plan(question)
 
+        # Retrieval stage
         knowledge = self.retriever.retrieve(plan["query"])
 
+        # Reasoning stage (LLM)
         reasoning = self.reasoner.reason(knowledge)
 
+        # Verification stage
         final = self.verifier.verify(reasoning)
 
-        # store answer in vector memory
+        # Store memory
         self.memory.add(question, final)
 
-        # extract relations for knowledge graph
-        words = final.split()
-
-        for w in words:
-
-            w = w.strip(",.()[]{}")
-
-            if len(w) > 5:
-                self.graph.add_relation(question, w)
+        # Generate dataset entry
+        self.dataset.generate_dataset(question, final)
 
         return final

@@ -1,0 +1,3 @@
+mode: development
+debug: true
+logging_level: INFO

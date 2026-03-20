@@ -2,5 +2,5 @@ class RetrieverAgent:
 
     def retrieve(self, query):
 
-        # placeholder for search
-        return f"retrieved knowledge about {query}"
+        # return the raw topic instead of placeholder text
+        return query

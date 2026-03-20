@@ -1,0 +1,12 @@
+system:
+  name: AI University Engine
+  version: 0.1
+
+api:
+  host: 127.0.0.1
+  port: 8000
+
+llm:
+  provider: ollama
+  model: mistral
+  endpoint: http://127.0.0.1:11434/api/generate

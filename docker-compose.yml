@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+  ai_engine:
+    build: .
+    ports:
+      - "8000:8000"
